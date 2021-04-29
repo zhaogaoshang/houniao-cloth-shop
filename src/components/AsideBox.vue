@@ -1,10 +1,10 @@
 <template>
   <div class="public-column__center left-box">
     <div class="public-row__center logo-box">
-      <img class="public-shou logo-image" src="@/assets/logo.png" alt="logo" @click="$router.replace('/')">
+      <img class="public-shou logo-image" src="@/assets/logo.png" alt="logo" @click="handleGoIndex">
     </div>
     <div class="public-row info-box" v-if="stylePick == 2">
-      <slot name="category"/>
+      <slot/>
     </div>
   </div>
 </template>
@@ -25,6 +25,10 @@ export default {
   computed: {
   },
   methods: {
+    handleGoIndex () {
+      this.$router.replace('/')
+      this.$store.commit('aside/switch', {path: '/'})
+    }
   }
 }
 </script>
@@ -32,14 +36,14 @@ export default {
 .left-box{
   width: 300px;
   height: 100%;
-  background: $theme-lan;
   border-radius: 0 $yj-50 $yj-50 0;
+  background: $theme-lan;
   overflow: hidden;
   .info-box{
     flex: 1;
     overflow: hidden;
     overflow-y: auto;
-    margin-right: -14px;
+    margin-right: -35px;
     width: 100%;
     align-items: stretch;
   }

@@ -42,6 +42,89 @@ let $utils = {
       hs.push(ar[Math.floor(Math.random() * al)])
     }
     return hs.join('')
+  },
+
+  /*
+    操作分类相关
+  */
+  // 删除分类
+  deleteCategory (setdata, list) {
+    function cb (searchList) {
+      let agent = -1
+      searchList.forEach((item, index) => {
+        if (item.id === setdata.id) {
+          agent = index
+          return false
+        } else {
+          if (item.children) {
+            cb(item.children)
+          }
+        }
+      })
+
+      if (agent !== -1) {
+        searchList.splice(agent, 1)
+      }
+    }
+
+    cb(list)
+  },
+
+  // 新增分类
+  setCategory (setdata, list) {
+    function cb (searchList) {
+      searchList.forEach(item => {
+        if (item.uuid === setdata.parentUuid) {
+          console.log(setdata)
+          item.children.push(setdata)
+          console.log(item)
+          return false
+        } else {
+          if (item.children) {
+            cb(item.children)
+          }
+        }
+      })
+    }
+
+    cb(list)
+  },
+
+  // 设置状态
+  setCategoryStatus (setdata, list) {
+    function cb (searchList) {
+      searchList.forEach(item => {
+        if (item.id === setdata.id) {
+          item.status = item.status === 0 ? 1 : 0
+          return false
+        } else {
+          if (item.children) {
+            cb(item.children)
+          }
+        }
+      })
+    }
+
+    cb(list)
+  },
+
+  // 更新分类
+  setCategoryName (setdata, list) {
+    function cb (searchList) {
+      searchList.forEach(item => {
+        if (item.id === setdata.id) {
+          item.name = setdata.name
+          item.photoPath = setdata.photoPath
+          return false
+        } else {
+          if (item.children) {
+            cb(item.children)
+          }
+        }
+      })
+    }
+
+    cb(list)
   }
 }
 

@@ -2,6 +2,7 @@
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
 import App from './App'
+import './utils/filter'
 
 // 第三方
 import router from './router'
@@ -15,6 +16,9 @@ import 'lib-flexible'
 // 自定义
 import $utils from './utils' // utils
 import apis from '@/http/api' // apis
+
+import Print from 'vue-print-nb' // 打印机
+Vue.use(Print) // 注册打印机
 
 // 第三方
 Vue.use(ElementUI)

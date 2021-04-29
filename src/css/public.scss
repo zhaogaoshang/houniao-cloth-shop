@@ -4,6 +4,7 @@ $hei-3:#333;
 $hui-6:#666;
 $hui-9:#999;
 $theme-lan:#007FCC;
+$lan:#007FCC;
 $huang-195: #FFD195;
 
 $yj-8: 8px;
@@ -16,6 +17,7 @@ $yj-50: 50px;
 @import './aside.scss';
 @import './other.scss';
 @import './el.scss';
+@import './icons.css';
 
 /*公共类*/
 .al {
@@ -35,7 +37,7 @@ $yj-50: 50px;
 }
 
 .container {
-  // background-image: $bgc-b;
+  height: 100%;
 }
 
 /**
@@ -45,10 +47,14 @@ $yj-50: 50px;
   <div class="publicright"></div>
 </div>
 */
-
+.public-row__align,
 .public-row {
   display: flex;
   flex-direction: row;
+}
+
+.public-row__align{
+  align-items: center;
 }
 
 .public-column {
@@ -60,6 +66,7 @@ $yj-50: 50px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   .public-center{
     flex: 1;
   }
@@ -72,8 +79,11 @@ $yj-50: 50px;
 }
 
 .public-right__box{
-  padding: 30px 20px;
   flex: 1;
+  background-color: $f7;
+  // border-radius: 30px 0px 0px 30px;
+  padding: 30px;
+  overflow-y: auto;
 }
 
 .public-row__center {
@@ -90,19 +100,14 @@ $yj-50: 50px;
   flex-direction: column;
 }
 
-
+i,
+.public-shou__color,
 .public-shou {
   cursor: pointer;
 }
 
-.public-shou:hover{
+.public-shou__color:hover{
   color: $theme-lan;
-}
-
-.public-right__box{
-  flex: 1;
-  padding: 30px;
-  overflow-y: auto;
 }
 
 .public-handel-user__box{
@@ -113,27 +118,92 @@ $yj-50: 50px;
     cursor: pointer;
   }
 }
+/*
 
-// 页面基础结构
-// <div class="container public-row">
-// <aside-box></aside-box>
-// <!-- 右边 -->
-// <div class="public-right__box">
-//   <!-- 上面 -->
-//   <div class="public-row public-handel-user__box">
-//     <user>
-//       <template v-slot:search>
-//         <search></search>
-//       </template>
-//       <template v-slot:right>
-//         <span class="margin-30 el-icon-switch-button"></span>
-//       </template>
-//     </user>
-//   </div>
+#public-chart__main{
+  flex: 1;
+}
+*/
+/*
+对话
+<el-dialog
+title="修改分类"
+:visible.sync="dialogTableVisible"
+width="504px"
+:close-on-click-modal="false"
+center>
+<div class="public-dialog">
+  <div class="public-column__center public-dialog__middle">
+    <el-input type="text"/>
+  </div>
+  <div class="public-row">
+    <discolor-btn typeStyle="su" @click.native="dialogTableVisible = false">取消</discolor-btn>
+    <discolor-btn typeStyle="middle">确定</discolor-btn>
+  </div>
+</div>
+</el-dialog>
+*/
 
-//   <!-- 底部入口 -->
-//   <div class="public-row__center">
-//     <btn-preservation v-for="(item, index) in categoryList" :key="index" :info="item.name"  @click.native="handleGomanAndWoman(item.router, item.params)"></btn-preservation>
-//   </div>
-// </div>
-// </div>
+.public-dialog{
+  .public-dialog__middle{
+    min-height: 170px;
+    border-top: 1px solid rgba($color: #000000, $alpha: .1);
+  }
+  .public-row{
+    justify-content: space-around;
+  }
+}
+/*
+页面基础结构
+<div class="container public-row">
+<aside-box></aside-box>
+<!-- 右边 -->
+<div class="public-right__box">
+  <!-- 上面 -->
+  <div class="public-row public-handel-user__box">
+    <user>
+      <template v-slot:search>
+        <search></search>
+      </template>
+      <template v-slot:right>
+        <span class="margin-30 el-icon-switch-button"></span>
+      </template>
+    </user>
+  </div>
+
+  <!-- 底部入口 -->
+  <div class="public-row__center">
+    <btn-preservation v-for="(item, index) in categoryList" :key="index" :info="item.name"  @click.native="handleGomanAndWoman(item.router, item.params)"></btn-preservation>
+  </div>
+</div>
+</div>
+*/
+
+::-webkit-scrollbar {
+  display: none; /* Chrome Safari */
+}
+
+.public-mianbao-right,
+.public-miaobao-left{
+  font-size: 16px;
+  font-weight: 500;
+}
+.public-miaobao-left,
+.public-mianbao-middle{
+  color: #666666;
+}
+
+.public-mianbao-right,
+.public-miaobao-left,
+.public-mianbao-middle,
+.public-mianbao-back{
+  margin-right: 10px;
+}
+
+.public-wait{
+  background-color: red !important;
+}
+
+.public-wait-f{
+  color: red !important;
+}

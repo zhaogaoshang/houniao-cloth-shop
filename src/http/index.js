@@ -1,14 +1,15 @@
 import axios from 'axios'
-import api from './api'
+// import api from './api'
 import Qs from 'qs'
 
 import store from '../store'
 
 const axiosWrap = axios.create({
-  baseURL: api.host,
+  // baseURL: api.host,
+  baseURL: '/api',
   timeout: 500000,
   headers: {
-    'Content-Type': 'application/json;charset=UTF-8'
+    'Content-Type': 'application/json'
   },
   paramsSerializer: function (params) {
     return Qs.stringify(params, {arrayFormat: 'brackets'})
@@ -17,20 +18,21 @@ const axiosWrap = axios.create({
 
 // 添加请求拦截器
 axiosWrap.interceptors.request.use(function (config) {
-  console.log(config)
-  // console.log(store.state.user.userInfo)
+  config.headers.token = store.state.user.token
 
-  if (config.method === 'get') {
-    config.params = {
-      superMerchantCode: store.state.user.userInfo.superMerchantCode,
-      merchantCode: store.state.user.userInfo.merchantCode,
-      ...config.params
-    }
+  if (config.headers['Content-Type'] === 'multipart/form-data') {
+    console.log(config)
   } else {
-    config.data = {
-      superMerchantCode: store.state.user.userInfo.superMerchantCode,
-      merchantCode: store.state.user.userInfo.merchantCode,
-      ...config.data
+    if (config.method === 'get') {
+      config.params = {
+        ...store.state.user.userInfo,
+        ...config.params
+      }
+    } else {
+      config.data = {
+        ...store.state.user.userInfo,
+        ...config.data
+      }
     }
   }
   // 在发送请求之前做些什么
@@ -46,6 +48,7 @@ axiosWrap.interceptors.response.use(function (response) {
   // 对响应数据做点什么
   return response.data
 }, function (error) {
+  // alert('服务器忙')
   // 对响应错误做点什么
   return Promise.reject(error)
 })

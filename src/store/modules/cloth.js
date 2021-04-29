@@ -5,9 +5,14 @@ const user = {
     colorList: [], // 颜色
     elementList: [], // 元素
     attributeList: [], // 属性
-    editItem: {} // 编辑项
+    editItem: {}, // 编辑项
+    agent: null
   }),
   mutations: {
+    // 设置媒介
+    setagent (state, data) {
+      state.agent = data
+    },
     // 设置品牌
     setBrandList (state, data) {
       state.brandList = data
