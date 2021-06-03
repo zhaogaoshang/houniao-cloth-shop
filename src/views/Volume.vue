@@ -164,7 +164,6 @@ export default {
             this._setData()
           }
         } else {
-          console.log('error submit!!')
           return false
         }
       })
@@ -195,7 +194,6 @@ export default {
 
     // 修改
     handleEdite (e) {
-      console.log(e)
       this.ruleForm = e
       this.isShowAdd = 'edit'
     },

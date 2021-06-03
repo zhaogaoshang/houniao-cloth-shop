@@ -2,15 +2,15 @@
   <div class="store-page">
     <user>
       <div class="public-row__align">
-        <div class="public-miaobao-left">客户管理 </div>
+        <div class="public-miaobao-left">企业管理 </div>
         <div class="public-mianbao-middle"> > </div>
-        <div class="public-mianbao-right" v-if="$route.query.type=='add'"> 添加账号 </div>
-        <div class="public-mianbao-right" v-if="$route.query.type=='edit'"> 修改账号 </div>
+        <div class="public-mianbao-right" v-if="$route.query.type=='add'"> 添加企业 </div>
+        <div class="public-mianbao-right" v-if="$route.query.type=='edit'"> 修改企业 </div>
         <btn class="public-mianbao-back" @click.native="$router.go(-1)">返回上一级</btn>
       </div>
     </user>
     <shadow-box>
-      <div class="title">添加账号</div>
+      <div class="title">添加企业</div>
       <div class="middle-box">
         <el-form class="public-column" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <div class="middle-box">
@@ -23,7 +23,7 @@
             <el-form-item label="确认密码：" prop="passwordConfirm">
               <el-input v-model="ruleForm.passwordConfirm" type="password"></el-input>
             </el-form-item>
-            <el-form-item label="账号名称：" prop="name">
+            <el-form-item label="企业名称：" prop="name">
               <el-input v-model="ruleForm.name" ></el-input>
             </el-form-item>
             <el-form-item label="联系人：" prop="contacts">
@@ -60,7 +60,14 @@
                   <btn typeStyle="su">上传</btn>
                 </f-upload>
               </el-form-item>
-              <img class="store-avatar" v-if="ruleForm.businessPhotos" :src="$apis.photoHost + ruleForm.businessPhotos">
+              <div class="public-row__align image-list">
+                <div class="image-box" v-for="(item, index) in ruleForm.businessPhotos" :key="index">
+                  <img class="store-avatar" v-if="ruleForm.businessPhotos" :src="$apis.photoHost + item">
+                  <div class="delete-box">
+                    <i class="el-icon-delete" @click="ruleForm.businessPhotos.splice(index, 1)"></i>
+                  </div>
+                </div>
+              </div>
             </div>
             <br/>
             <br/>
@@ -117,7 +124,7 @@ export default {
     return {
       ruleForm: {
         name: '', // 账号名称：
-        businessPhotos: '', // 营业执照  多个用逗号隔开
+        businessPhotos: [], // 营业执照  多个用逗号隔开
         phone: '', // 手机
         password: '', // 密码
         passwordConfirm: '', // 确认密码
@@ -199,7 +206,6 @@ export default {
       }
 
       this.$http.post(this.$apis.api_upload_userByBusinessPhotos, param, config).then(res => {
-        console.log(res)
       })
 
       // let fileObject = param.file
@@ -270,6 +276,7 @@ export default {
         this.type = this.$route.query.type
         if (this.type === 'edit') {
           let newObj = JSON.parse(JSON.stringify(this.$store.state.account.agent))
+          newObj.businessPhotos = newObj.businessPhotos.split(',')
           newObj.passwordConfirm = newObj.password
           this.ruleForm = newObj
           this.handleRegin(this.ruleForm.province, false).then(_ => {
@@ -283,8 +290,7 @@ export default {
 
     // 营业执照
     handleDiscriptionImage (e) {
-      console.log(e)
-      this.ruleForm.businessPhotos = e.result
+      this.ruleForm.businessPhotos.push(e.result)
     },
 
     submitForm (formName) {
@@ -307,7 +313,10 @@ export default {
 
     // 提交表单
     _handleSubmit () {
-      this.$http.post(this.$apis.api_user_save, this.ruleForm).then(res => {
+      this.$http.post(this.$apis.api_user_save, {
+        ...this.ruleForm,
+        businessPhotos: this.ruleForm.businessPhotos.join(',')
+      }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         this.$message({
           type: 'success',
@@ -321,7 +330,10 @@ export default {
 
     _updata () {
       delete this.ruleForm.createTime
-      this.$http.post(this.$apis.api_user_update, this.ruleForm).then(res => {
+      this.$http.post(this.$apis.api_user_update, {
+        ...this.ruleForm,
+        businessPhotos: this.ruleForm.businessPhotos.join(',')
+      }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         this.$message({
           type: 'success',
@@ -348,9 +360,10 @@ export default {
   margin-bottom: 20px;
 }
 .store-avatar{
+  position: relative;
   height: 100px;
   width: 100px;
-  margin-left: 100px;
+  margin-right: 20px;
 }
 .bei-zhu{
   width: 400px;
@@ -365,4 +378,28 @@ export default {
   height: 100px;
   width: 100px;
 }
+
+.image-list{
+  margin-left: 100px;
+  .image-box{
+    position: relative;
+  }
+  .image-box:hover .delete-box{
+    display: block;
+  }
+  .delete-box{
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: 100px;
+    background-color: rgba($color: #000000, $alpha: .2);
+    font-size: 30px;
+    text-align: center;
+    line-height: 100px;
+    color: white;
+  }
+}
+
 </style>

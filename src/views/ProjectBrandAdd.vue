@@ -1,12 +1,26 @@
 <template>
   <div class="public-column category">
     <user>
-      <search @search="handleSearch()" v-model="params.modelInfo"></search>
-      <discolor-btn typeStyle="middle" @click.native="handelAdd">添加部位名称</discolor-btn>
+      <div class="public-row__align">
+        <div class="public-miaobao-left">项目管理 </div>
+        <div class="public-mianbao-middle"> > </div>
+        <div class="public-mianbao-right"> 面料品牌供应管理 </div>
+        <div class="public-mianbao-middle"> > </div>
+        <div class="public-mianbao-right"> 新增供应品牌 </div>
+        <btn class="public-mianbao-back" @click.native="$router.go(-1)">返回上一级</btn>
+      </div>
     </user>
     <div class="public-row bottom-info">
       <shadow-box>
-        <div class="title">部位管理</div>
+        <div class="public-heng">
+          <div class="public-row__align public-left">
+            <div class="title">品牌列表</div>
+          </div>
+          <div class="public-center"></div>
+          <div class="publicright">
+            <search @search="handleSearch()" v-model="params.name"></search>
+          </div>
+        </div>
         <div>
           <el-table
             :data="tableData.items"
@@ -17,30 +31,31 @@
               width="100"
               label="序号">
             </el-table-column>
-            <!-- <el-table-column
-              prop="name"
-              label="所属性别">
-              <template slot-scope="scope">
-                {{scope.row.sex === 0 ? '男' : '女'}}
-              </template>
-            </el-table-column> -->
             <el-table-column
               prop="name"
-              label="部位名称">
+              label="面料品牌">
             </el-table-column>
             <el-table-column
-              prop="code"
-              label="部位编码">
+              prop=""
+              label="面料LOGO">
+              <!-- <template slot-scope="scope">
+                <img class="logo-image" :src="$apis.photoHost + scope.row.photoPath" alt="">
+              </template> -->
+            </el-table-column>
+            <el-table-column
+              prop=""
+              label="品牌介绍">
+            </el-table-column>
+            <el-table-column
+              prop=""
+              label="面料产地">
             </el-table-column>
             <el-table-column
               prop="address"
               label="操作">
               <template slot-scope="scope">
-                <i class="el-icon-edit" @click="handleEdite(scope.row)"></i>
-                &nbsp;
-                &nbsp;
-                &nbsp;
-                <i class="el-icon-delete" @click="handleDeitTip(scope.row)"></i>
+                <btn typeStyle="su" @click.native="handleAdd(scope.row)" v-if="scope.row.configType === 1">添加</btn>
+                <btn typeStyle="su" v-if="scope.row.configType === 2">已添加</btn>
               </template>
             </el-table-column>
           </el-table>
@@ -64,11 +79,14 @@
       width="30%"
       center>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item label="类型名称：" prop="name">
+          <el-form-item label="部位名称：" prop="name">
             <el-input v-model="ruleForm.name"></el-input>
           </el-form-item>
-          <el-form-item label="部位编码：" prop="code">
-            <el-input v-model="ruleForm.code"></el-input>
+          <el-form-item label="所属性别：" prop="sex">
+            <el-radio-group v-model="ruleForm.sex">
+              <el-radio :label="0">男</el-radio>
+              <el-radio :label="1">女</el-radio>
+            </el-radio-group>
           </el-form-item>
         </el-form>
       <span slot="footer" class="dialog-footer">
@@ -95,13 +113,13 @@ export default {
       ruleForm: {
         name: '',
         status: 0,
-        code: ''
+        sex: 0,
+        bodyValue: 0
       },
 
       params: {
         name: '',
-        code: '',
-        modelInfo: '',
+        type: '1',
         currentPage: 1,
         pageSize: 10
       },
@@ -112,7 +130,7 @@ export default {
         name: [
           { required: true, message: '请输入活动名称', trigger: 'blur' }
         ],
-        code: [
+        sex: [
           { required: true, message: '请选择活动资源', trigger: 'change' }
         ]
       }
@@ -132,12 +150,22 @@ export default {
   },
 
   methods: {
+    // 添加到门店
+    handleAdd (data) {
+      this.$http.post(this.$apis.api_material_synMaterial, {
+        superMerchantCode: this.$route.query.clientMerchantCode,
+        brandId: data.id
+      }).then(res => {
+        if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        this.$message.success('操作成功')
+      })
+    },
+
     //
     _initParams (data) {
       this.params = {
         name: '',
-        code: '',
-        modelInfo: '',
+        type: '1',
         currentPage: 1,
         pageSize: 10,
         ...data
@@ -148,13 +176,12 @@ export default {
     handelAdd () {
       this.isShowAdd = 'add'
       this.ruleForm.name = ''
-      this.ruleForm.code = ''
     },
 
     // 搜索
     handleSearch () {
       this._initParams({
-        modelInfo: this.params.modelInfo
+        name: this.params.name
       })
       this._getList()
     },
@@ -176,7 +203,7 @@ export default {
 
     // 量体部位添加
     _setData () {
-      this.$http.post(this.$apis.api_modelConfig_save, this.ruleForm).then(res => {
+      this.$http.post(this.$apis.api_volumeBodily_save, this.ruleForm).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         this.isShowAdd = 'none'
         this.$message.success('操作成功')
@@ -186,7 +213,10 @@ export default {
 
     // 获取列表
     _getList () {
-      this.$http.post(this.$apis.api_modelConfig_list, this.params).then(res => {
+      this.$http.post(this.$apis.api_materialConfig_list, {
+        ...this.params,
+        clientMerchantCode: this.$route.query.clientMerchantCode
+      }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         if (res.result.items.length === 0 && this.params.currentPage > 1) {
           --this.params.currentPage
@@ -223,7 +253,7 @@ export default {
     // 修改
     _edit () {
       delete this.ruleForm.createTime
-      this.$http.post(this.$apis.api_modelConfig_update, this.ruleForm).then(res => {
+      this.$http.post(this.$apis.api_volumeBodily_update, this.ruleForm).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         this.isShowAdd = 'none'
         this._getList()
@@ -232,7 +262,7 @@ export default {
 
     // 删除
     _delete (e) {
-      this.$http.post(this.$apis.api_modelConfig_update, {
+      this.$http.post(this.$apis.api_volumeBodily_update, {
         id: e.id,
         status: 2
       }).then(res => {
@@ -244,8 +274,7 @@ export default {
     // 页容量
     handleSizeChange (e) {
       this._initParams({
-        pageSize: e,
-        modelInfo: this.params.modelInfo
+        pageSize: e
       })
       this._getList()
     },
@@ -253,8 +282,7 @@ export default {
     // 页码
     handleCurrentChange (e) {
       this._initParams({
-        currentPage: e,
-        modelInfo: this.params.modelInfo
+        currentPage: e
       })
       this._getList()
     }
@@ -279,7 +307,15 @@ export default {
   .title{
     font-size: 22px;
     font-weight: 800;
-    margin-bottom: 20px;
+  }
+  .el-dropdown-link {
+    cursor: pointer;
+    color: white;
+  }
+  .logo-image{
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
   }
 }
 </style>

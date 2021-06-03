@@ -56,7 +56,7 @@
         <div class="public-row__align public-center">
           <div class="input-item" v-for="(item, index) in addParentParams.specialOptionName" :key="index">
             <el-input clear="" v-model="addParentParams.specialOptionName[index]" clearable></el-input>
-            <i class="el-icon-error" @click="addParentParams.specialOptionName.splice(index, 1)"></i>
+            <i class="el-icon-error" @click="addParentParams.specialOptionName.splice(index, 1)" v-if="index !== 0"></i>
           </div>
         </div>
         <div class="publicright">
@@ -89,7 +89,7 @@
           <div class="input-item" v-for="(item, index) in editSonParams.list" :key="index">
             <el-input clear="" v-model="editSonParams.list[index].name" :value="item.name"></el-input>
             <!-- <el-input clear="" :value="item.name"></el-input> -->
-            <i class="el-icon-error" @click="editSonParams.list.splice(index, 1)"></i>
+            <i class="el-icon-error" @click="editSonParams.list.splice(index, 1)" v-if="index !== 0"></i>
           </div>
         </div>
         <div class="publicright">
@@ -179,6 +179,11 @@ export default {
 
     // 编辑子集
     handleSubmitSon () {
+      if (this.editSonParams.list.length === 0 || !this.editSonParams.list.every(item => item.name)) {
+        this.$message.error('选项不能为空')
+        return
+      }
+
       this.$http.post(this.$apis.api_specialBodily_subsetUpdate, {
         parentId: this.editSonParams.id,
         name: this.editSonParams.list.map(item => item.name).join('/'),
@@ -193,6 +198,11 @@ export default {
 
     // 提交添加父级
     handleSubmit () {
+      if (this.addParentParams.specialOptionName.length === 0 || !this.addParentParams.specialOptionName.every(item => item)) {
+        this.$message.error('选项不能为空')
+        return
+      }
+
       if (this.isShowParentSpecial === 'add') {
         this._addParent()
       } else {

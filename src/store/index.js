@@ -6,6 +6,7 @@ import aside from './modules/aside' // 男装女装左边侧边栏的
 import cloth from './modules/cloth' // 面料
 import staff from './modules/staff' // 面料
 import client from './modules/client' // 面料
+import fabric from './modules/fabric' // 面料
 import category from './modules/category' // 分类模型
 import account from './modules/account' // 账号
 import VuexPersistence from 'vuex-persist'
@@ -14,7 +15,7 @@ Vue.use(Vuex)
 
 const vuexLocal = new VuexPersistence({
   storage: window.localStorage,
-  modules: ['aside', 'user', 'client', 'category', 'account']
+  modules: ['aside', 'user', 'client', 'category', 'account', 'cloth', 'fabric']
 })
 
 const store = new Vuex.Store({
@@ -23,6 +24,7 @@ const store = new Vuex.Store({
     aside,
     cloth,
     staff,
+    fabric,
     client,
     account,
     category

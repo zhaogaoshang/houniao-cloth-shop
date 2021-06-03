@@ -14,14 +14,17 @@
         style="width: 100%">
         <el-table-column
           type="index"
+          width="100"
           label="序号">
         </el-table-column>
         <el-table-column
+          width="200"
           prop="volumeBodilyName"
           label="部位名称">
         </el-table-column>
         <el-table-column
           prop="address"
+          width="200"
           label="是否必填">
           <template slot-scope="scope">
             <!-- <el-button
@@ -30,7 +33,7 @@
               size="small">
               移除
             </el-button> -->
-            <div class="public-row__center public-shou" @click="handleSwitch(scope.row)">
+            <div class="public-row__align public-shou" @click="handleSwitch(scope.row)">
               <div class="public-row__center el-icon-check pick-box__active" v-if="scope.row.type === 0"></div>
               <div class="public-row__center el-icon-check pick-box__disabel" v-if="scope.row.type === 1"></div>
               &nbsp;
@@ -40,18 +43,20 @@
             </div>
           </template>
         </el-table-column>
-        <!-- <el-table-column
+        <el-table-column
           prop="address"
           label="操作">
           <template slot-scope="scope">
-            <el-button
+            <!-- <el-button
               @click.native.prevent="deleteRow(scope.$index, tableData)"
               type="text"
               size="small">
               移除
-            </el-button>
+            </el-button> -->
+            <!-- <i class="public-wait-f el-icon-edit" @click="handelEdit(scope.row)"></i>  产品经理去除-->
+            <i class="el-icon-delete" @click="handleDelete(scope.row)"></i>
           </template>
-        </el-table-column> -->
+        </el-table-column>
       </el-table>
     </div>
     <div class="public-row__center total-box">
@@ -128,9 +133,44 @@ export default {
   },
 
   methods: {
+    // 修改
+    handelEdit (e) {
+    },
+
+    // 删除
+    handleDelete (data) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        center: true
+      }).then(() => {
+        this._deleteModel(data)
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+
+    // 删除
+    _deleteModel (e) {
+      // 提交修改状态
+      this.$http.post(this.$apis.api_volumeBodilyConfiguration_update, {
+        id: e.id,
+        status: 2,
+        type: 1,
+        categoryUuid: this.$route.query.uuid
+      }).then(res => {
+        if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        this.$message.success('操作成功')
+        this._getList()
+      })
+    },
+
     // 切换
     handleSwitch (e) {
-      console.log(e)
       this.$confirm('此操作将修改状态, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -140,7 +180,9 @@ export default {
         // 提交修改状态
         this.$http.post(this.$apis.api_volumeBodilyConfiguration_update, {
           id: e.id,
-          type: e.type === 0 ? 1 : 0
+          type: e.type === 0 ? 1 : 0,
+          uuid: this.$route.query.uuid,
+          categoryUuid: this.$route.query.uuid
         }).then(res => {
           if (res.code !== 'SUCCESS') return this.$message(res.msg)
           this.$message.success('操作成功')
@@ -175,18 +217,22 @@ export default {
 
     // 获取量体部位信息列表
     _getVolumeListList () {
-      this.$http.post(this.$apis.api_volumeBodily_list, {}).then(res => {
+      this.$http.post(this.$apis.api_volumeBodily_list, {
+        uuid: this.$route.query.uuid,
+        categoryUuid: this.$route.query.uuid
+      }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
-        console.log(res)
         this.volumeList = res.result
       })
     },
 
     // 获取列表
     _getList () {
-      this.$http.post(this.$apis.api_volumeBodilyConfiguration_list, this.params).then(res => {
+      this.$http.post(this.$apis.api_volumeBodilyConfiguration_list, {
+        ...this.params,
+        categoryUuid: this.$route.query.uuid
+      }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
-        console.log(res)
         if (res.result.items.length === 0 && this.params.currentPage > 1) {
           --this.params.currentPage
           this._getList()
@@ -209,10 +255,11 @@ export default {
 
       this.$http.post(this.$apis.api_volumeBodilyConfiguration_save, {
         categoryId: this.$route.query.id,
-        volumeJson: JSON.stringify(newVolumeList)
+        volumeJson: JSON.stringify(newVolumeList),
+        categoryUuid: this.$route.query.uuid,
+        categoryName: this.$route.query.name
       }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
-        console.log(res)
         this.isShowAddEdit = 'none'
         this._getList()
       })

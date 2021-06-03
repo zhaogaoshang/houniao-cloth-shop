@@ -75,9 +75,7 @@ let $utils = {
     function cb (searchList) {
       searchList.forEach(item => {
         if (item.uuid === setdata.parentUuid) {
-          console.log(setdata)
           item.children.push(setdata)
-          console.log(item)
           return false
         } else {
           if (item.children) {

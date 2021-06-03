@@ -1,23 +1,47 @@
 <template>
   <div class="public-column category">
     <user>
+      <div class="public-row__align">
+        <div class="public-miaobao-left">面料管理 </div>
+        <div class="public-mianbao-middle"> > </div>
+        <div class="public-mianbao-right" v-if="$route.query.type == 1">品牌管理</div>
+        <div class="public-mianbao-right" v-if="$route.query.type == 2">颜色管理</div>
+        <div class="public-mianbao-right" v-if="$route.query.type == 3">属性管理</div>
+        <btn class="public-mianbao-back" @click.native="$router.go(-1)">返回上一级</btn>
+      </div>
         <!-- <search @search="handleSearch" v-model="params.systemName"></search> -->
         <div></div>
         <!-- <discolor-btn typeStyle="middle" @click.native="handleIsShowParentSpecial('add')">添加品牌</discolor-btn> -->
-        <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')">添加品牌</discolor-btn>
+        <!-- <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')" v-if="$route.query.type == 1">添加品牌</discolor-btn> -->
+        <!-- <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')" v-if="$route.query.type == 2">添加颜色</discolor-btn> -->
+        <!-- <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')" v-if="$route.query.type == 3">添加属性</discolor-btn> -->
     </user>
 
     <div class="public-row bottom-info">
       <shadow-box>
-        <div class="title">面料品牌管理</div>
+        <div class="public-heng">
+          <div>
+            <div class="title" v-if="$route.query.type == 1">面料品牌管理</div>
+            <div class="title" v-if="$route.query.type == 2">面料颜色管理</div>
+            <div class="title" v-if="$route.query.type == 3">面料属性管理</div>
+          </div>
+          <div class="public-center"></div>
+          <div>
+            <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')" v-if="$route.query.type == 1">添加品牌</discolor-btn>
+            <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')" v-if="$route.query.type == 2">添加颜色</discolor-btn>
+            <discolor-btn typeStyle="middle" @click.native="handleIsShowSonSpecial('add')" v-if="$route.query.type == 3">添加属性</discolor-btn>
+          </div>
+        </div>
         <el-row class="row-item" v-for="(item, index) in tableData.items" :key="index">
           <el-col :span="23">
-            <div class="title-name">品牌：{{item.name}}</div>
-            <span class="discription-item">选项：</span>
+            <div class="title-name" v-if="$route.query.type == 1">品牌：{{item.name}}</div>
+            <div class="title-name" v-if="$route.query.type == 2">颜色：{{item.name}}</div>
+            <div class="title-name" v-if="$route.query.type == 3">属性：{{item.name}}</div>
+            <!-- <span class="discription-item">选项：</span>
             <span class="discription" v-for="(only, index) in item.configurationList" :key="index">
               <span>{{only.name}}</span>
               &nbsp;
-            </span>
+            </span> -->
 
             <!-- <div class="discription" v-for="(only, index) in item.systemName" :key="index"> -->
               <!-- <span class="discription-item" v-for="(the, index) in only.systemName" :key="index">{{the.name}}</span> -->
@@ -79,24 +103,23 @@
 
     <!-- 选项 -->
     <el-dialog
-      title="选项管理"
+      :title="$route.query.type == 1?'品牌管理': $route.query.type == 2? '颜色管理':'属性管理'"
       :visible="isShowSonSpecial !== 'none'"
       width="30%"
       :show-close="false"
       center>
       <div class="public-row__center">
-        <span>信息名称：</span>
+        <span>{{$route.query.type == 1 ? '品牌' : $route.query.type == 2 ? '颜色' : '属性'}}名称：</span>
         <el-input class="input-name" v-model="editSonParams.name"></el-input>
         <!-- <span>{{editSonParams.name}}</span> -->
       </div>
       <br/>
       <br/>
-      <div class="public-heng">
+      <!-- <div class="public-heng">
         <div class="public-left">属性选项：</div>
         <div class="public-row__align public-center">
           <div class="input-item" v-for="(item, index) in editSonParams.configurationList" :key="index">
             <el-input clear="" v-model="editSonParams.configurationList[index].name" :value="item.name"></el-input>
-            <!-- <el-input clear="" :value="item.name"></el-input> -->
             <i class="el-icon-error" @click="editSonParams.configurationList.splice(index, 1)"></i>
           </div>
         </div>
@@ -105,7 +128,7 @@
             name: ''
           })">新增</btn>
         </div>
-      </div>
+      </div> -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="isShowSonSpecial = 'none'">取 消</el-button>
         <el-button type="primary" @click="handleSubmitSon">确 定</el-button>

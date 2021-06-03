@@ -1,5 +1,5 @@
 <template>
-  <div class="public-column store-page">
+  <div class="public-wait public-column store-page">
     <user>
       <div class="public-row__align">
         <div class="public-miaobao-left">客户管理 </div>
@@ -14,14 +14,13 @@
         <el-form class="public-column" :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px">
           <div class="middle-box">
             <el-form-item label="品牌名称：" prop="name">
-              <el-input v-model="ruleForm.abbreviationName" :disabled="type == 'info'"></el-input>
+              <el-input v-model="ruleForm.abbreviationName"></el-input>
             </el-form-item>
             <el-form-item label="营业执照：">
               <el-upload
                 :headers="{
                   token: $store.state.user.token
                 }"
-                :disabled="type == 'info'"
                 class="upload-demo"
                 name="imgUpload"
                 :data="{
@@ -38,10 +37,10 @@
             <img class="store-avatar" v-if="ruleForm.logoPath" :src="$apis.photoHost + ruleForm.logoPath">
           </div>
           <el-form-item label="面料产地：" prop="address">
-            <el-input v-model="ruleForm.address" :disabled="type == 'info'"></el-input>
+            <el-input v-model="ruleForm.address"></el-input>
           </el-form-item>
           <el-form-item label="品牌介绍：" prop="address">
-            <el-input type="textarea" class="bei-zhu" v-model="ruleForm.address" :disabled="type == 'info'"></el-input>
+            <el-input type="textarea" class="bei-zhu" v-model="ruleForm.address"></el-input>
           </el-form-item>
         </el-form>
       </div>
@@ -105,7 +104,6 @@ export default {
 
     // 退出
     handleSignOut () {
-      this.type = 'info'
       this._getInfo()
     },
 
@@ -135,11 +133,15 @@ export default {
           type: 'success',
           message: '操作成功'
         })
-        this.type = 'info'
       }).catch(res => {
         alert('post')
       })
     }
+  },
+
+  //
+  beforeDestroy () {
+    this.$store.commit('fabric/agent', null)
   }
 }
 </script>

@@ -3,9 +3,18 @@
     <div class="public-heng">
       <btn>
         <el-dropdown @command="handleDisableEnable">
-          <span class="el-dropdown-link">
-            <!-- {{scope.row.status == 0 ? '启用' : '禁用'}}<i class="el-icon-arrow-down el-icon--right"></i> -->
+          <!-- <span class="el-dropdown-link">
             全部启用<i class="el-icon-arrow-down el-icon--right"></i>
+          </span> -->
+          <span class="el-dropdown-link">
+            <div v-if="tableData.every(item => item.status == 1)">
+              全部禁用
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
+            <div v-else>
+              全部启用
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item :command="{item: null, type: 0, all: true}">启用</el-dropdown-item>
@@ -37,7 +46,7 @@
         <el-table-column
           label="英文名称">
           <template slot-scope="scope">
-            {{scope.row.name}}
+            {{scope.row.englishName}}
             &nbsp;
             &nbsp;
             &nbsp;
@@ -151,7 +160,14 @@
             <span>中文名称：</span>
             &nbsp;
             &nbsp;
-            <el-input class="input-add" v-model="ruleForm.name"></el-input>
+            <el-input class="input-add" v-model="ruleForm.name" disabled></el-input>
+          </div>
+          <br/>
+          <div class="public-row__center">
+            <span>英文名称：</span>
+            &nbsp;
+            &nbsp;
+            <el-input class="input-add" v-model="ruleForm.englishName"></el-input>
           </div>
           <br/>
         </div>
@@ -377,13 +393,11 @@ export default {
 
     // 模型上传
     handleModelSuccess (e) {
-      console.log(e)
       this.ruleForm.modelPath = e.result
     },
 
     // 封面上传
     handleImageSuccess (e) {
-      console.log(e)
       this.ruleForm.photoPath = e.result
     },
 
@@ -404,7 +418,6 @@ export default {
 
     // 切换
     handleSwitch (e) {
-      console.log(e)
       this.$confirm('此操作将修改状态, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

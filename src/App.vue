@@ -14,23 +14,14 @@ export default {
   created () {
   },
   mounted () {
-    // window.addEventListener('onbeforeunload', _ => {
-    //   // 鼠标相对于用户屏幕的水平位置 - 窗口左上角相对于屏幕左上角的水平位置 = 鼠标在当前窗口上的水平位置
-    //   var n = window.event.screenX - window.screenLeft
-    //   // 鼠标在当前窗口内时，n<m，b为false；鼠标在当前窗口外时，n>m，b为true。20这个值是指关闭按钮的宽度
-    //   var b = n > document.documentElement.scrollWidth - 20
-    //   // 鼠标在客户区内时，window.event.clientY>0；鼠标在客户区外时，window.event.clientY<0
-    //   if ((b && window.event.clientY < 0) || window.event.altKey || window.event.ctrlKey) { // 关闭浏览器时你想做的事
-    //     alert('"关闭"')
-    //     this.$store.commit('category/agent', 123)
-    //     this.$store.commit('client/agent', null)
-    //     this.$store.commit('aside/clear', null)
-    //   } else if (window.event.clientY > document.body.clientHeight || window.event.altKey) {
-    //     this.$store.commit('category/agent', 456)
-    //     // 刷新浏览器时你想做的事
-    //     alert('"刷新"')
-    //   }
-    // })
+    document.addEventListener('visibilitychange', () => {
+      var isHidden = document.hidden
+      if (isHidden) {
+        // document.title = '隐藏'
+      } else {
+        // document.title = '显示'
+      }
+    })
   },
   methods: {
   }

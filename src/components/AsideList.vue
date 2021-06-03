@@ -20,7 +20,7 @@ export default {
           path: '/category/model'
         },
         {
-          name: '账号管理',
+          name: '企业管理',
           icon: 'cloth.png',
           activeIcon: 'cloth-se.png',
           path: '/account'

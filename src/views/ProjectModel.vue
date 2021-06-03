@@ -59,7 +59,7 @@
               <el-tooltip placement="right" v-if="node.level==4">
                 <div slot="content">
                   <!-- <div class="public-shou handle-categorty" @click="handleAddEditCategory('add', data)">新增子级分类</div> -->
-                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data)">编辑</div>
+                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data, false)">编辑</div>
                   <!-- <div class="public-shou handle-categorty" @click="handleAddDeleteCategory(data)">删除</div> -->
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 0">禁用</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 1">启用</div>
@@ -68,7 +68,7 @@
               </el-tooltip>
               <el-tooltip placement="right" v-if="node.level==5">
                 <div slot="content">
-                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data)">编辑</div>
+                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data, false)">编辑</div>
                   <!-- <div class="public-shou handle-categorty" @click="handleAddDeleteCategory(data)">删除</div> -->
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 0">禁用</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 1">启用</div>
@@ -95,26 +95,10 @@
         <span class="name-text">分类名称：</span>
         <el-input :value="handelCategory.name" v-model="handelCategory.name"></el-input>
       </div>
-      <div class="public-row__align caterogy-name__box" v-if="handelCategory.name">
+      <div class="public-row__align caterogy-name__box" v-if="handelCategory.name && isAddPhoto">
         <span class="name-text">分类图片：</span>
-        <!-- <el-upload
-          disabled
-          class="avatar-uploader"
-          name="imgUpload"
-          :action="$apis.api_upload_categoryByPhoto"
-          :show-file-list="false"
-          :data="{
-            superMerchantCode: $store.state.user.userInfo.superMerchantCode,
-            merchantCode: $store.state.user.userInfo.merchantCode,
-            name: handelCategory.name
-          }"
-          :on-success="handleAvatarSuccess">
-          <img v-if="handelCategory.photoPath" :src="$apis.photoHost + handelCategory.photoPath" class="avatar avatar-about">
-          <i v-else class="el-icon-plus avatar-uploader-icon public-row__center avatar-about"></i>
-        </el-upload> -->
 
         <f-upload
-          disabled
           class="avatar-uploader"
           :upData="{
             typeName: 'introduce'
@@ -144,6 +128,7 @@ export default {
 
   data () {
     return {
+      isAddPhoto: true,
       searchInfo: '', // 搜索内容
       editCategory: 'none', // 是否 编辑，添加分类 是否显示 none add edit
       // 编辑 或添加 的分类
@@ -310,6 +295,11 @@ export default {
       }).catch(() => {})
     },
 
+    //
+    handleDiscriptionImage (e) {
+      this.handelCategory.photoPath = e.result
+    },
+
     // 提交操作分类
     handleSubmitCategory () {
       if (this.editCategory === 'add') {
@@ -386,7 +376,8 @@ export default {
     },
 
     // 添加 编辑 显示分类
-    handleAddEditCategory (type, data) {
+    handleAddEditCategory (type, data, isAddPhoto = true) {
+      this.isAddPhoto = isAddPhoto
       this.editCategory = type // add edit
 
       if (type === 'add') {

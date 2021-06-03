@@ -16,12 +16,18 @@
       <btn>
         <el-dropdown @command="handleDisableEnable">
           <span class="el-dropdown-link">
-            <!-- {{scope.row.status == 0 ? '启用' : '禁用'}}<i class="el-icon-arrow-down el-icon--right"></i> -->
-            全部启用<i class="el-icon-arrow-down el-icon--right"></i>
+            <div v-if="tableData.every(item => item.status == 1)">
+              全部禁用
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
+            <div v-else>
+              全部启用
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item :command="{item: null, type: 0, all: true}">启用</el-dropdown-item>
-            <el-dropdown-item :command="{item: null, type: 1, all: true}">禁用</el-dropdown-item>
+            <el-dropdown-item :command="{item: null, type: 0, all: true}">全部启用</el-dropdown-item>
+            <el-dropdown-item :command="{item: null, type: 1, all: true}">全部禁用</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </btn>
@@ -212,6 +218,9 @@
             </f-upload>
         </div>
       </div>
+      <div class="public-column__center">
+        <el-checkbox v-model="isSuccessiveAdd">继续新增模型</el-checkbox>
+      </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="isShowAddEdit = 'none'">取 消</el-button>
         <el-button type="primary" @click="submitForm">确 定</el-button>
@@ -251,7 +260,10 @@ export default {
       // 部位列表
       positionList: {
         items: []
-      }
+      },
+
+      // 是否继续添加
+      isSuccessiveAdd: false
     }
   },
 
@@ -276,7 +288,7 @@ export default {
 
   methods: {
     handleDeleteAll () {
-      this.$confirm(`此操作将修改状态, 是否继续?`, '提示', {
+      this.$confirm(`此操作将永久删除，是否继续？`, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -363,7 +375,7 @@ export default {
 
     // 删除
     handleDelete (e) {
-      this.$confirm('此操作将永久删除该, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -399,19 +411,16 @@ export default {
 
     // 模型上传
     handleModelSuccess (e) {
-      console.log(e)
       this.ruleForm.modelPath = e.result
     },
 
     // 封面上传
     handleImageSuccess (e) {
-      console.log(e)
       this.ruleForm.photoPath = e.result
     },
 
     // 显示添加或者修改
     handleShowAddEdit (e, data) {
-      console.log(data)
       this.isShowAddEdit = e
       if (e === 'add') {
         this._initForm()
@@ -427,8 +436,7 @@ export default {
 
     // 切换
     handleSwitch (e) {
-      console.log(e)
-      this.$confirm('此操作将修改状态, 是否继续?', '提示', {
+      this.$confirm('此操作将永久删除，是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
@@ -531,7 +539,12 @@ export default {
       }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         this.$message.success('操作成功')
-        this.isShowAddEdit = 'none'
+
+        if (this.isSuccessiveAdd) {
+          this._initForm()
+        } else {
+          this.isShowAddEdit = 'none'
+        }
         this._getList()
       })
     },

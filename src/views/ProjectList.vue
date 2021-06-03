@@ -1,7 +1,7 @@
 <template>
   <div class="public-column category">
     <user>
-      <search></search>
+      <search @search="handleSearch" v-model="params.userInfo"></search>
     </user>
     <div class="public-row bottom-info">
       <shadow-box>
@@ -46,7 +46,8 @@
                     &nbsp;
                     <btn typeStyle="su" @click.native="handelGoModel(scope.row)">分类模型管理</btn>
                     &nbsp;
-                    <btn class="public-wait-f" typeStyle="su">面料品牌供应管理</btn>
+                    <btn typeStyle="su" @click.native="handelGoBrand(scope.row)" v-if="params.clientSideType == 1">面料品牌供应管理</btn>
+                    <btn typeStyle="su" @click.native="handelGoBrandByCloth(scope.row)" v-if="params.clientSideType == 2">品牌管理</btn>
                     &nbsp;
                     <btn typeStyle="su" @click.native="handleUpdata(scope.row)">更新</btn>
                   </div>
@@ -68,6 +69,54 @@
         </div>
       </shadow-box>
     </div>
+
+    <el-dialog
+      title="开通账号"
+      :visible.sync="isShowOpen"
+      width="30%"
+      center>
+      <div class="open-box">
+        <div class="public-row__align">
+          <span class="title-box">企业名称</span>
+          <span>:</span>
+          &nbsp;
+          &nbsp;
+          <span>{{openData.name}}</span>
+        </div>
+        <div class="public-row__align">
+          <span class="title-box">地址</span>
+          <span>:</span>
+          &nbsp;
+          &nbsp;
+          <span>{{openData.province}}-{{openData.city}}-{{openData.area}}</span>
+        </div>
+        <div class="public-row__align">
+          <span class="title-box">开通权限</span>
+          <span>:</span>
+          &nbsp;
+          &nbsp;
+          <span>{{_openName()}}</span>
+        </div>
+        <div class="public-row__align">
+          <span class="title-box">手机号</span>
+          <span>:</span>
+          &nbsp;
+          &nbsp;
+          <span>{{openData.phone}}</span>
+        </div>
+        <div class="public-row__align">
+          <span class="title-box">开通密码</span>
+          <span>:</span>
+          &nbsp;
+          &nbsp;
+          <el-input class="input-password" v-model="openData.password"/>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="isShowOpen = false">取 消</el-button>
+        <el-button type="primary" @click="handleOpen">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -79,7 +128,7 @@ import User from '../components/User.vue'
 
 export default {
   components: { ShadowBox, User, Btn, Search, DiscolorBtn },
-  name: '',
+  name: 'ProjectList',
 
   data () {
     return {
@@ -105,7 +154,10 @@ export default {
           clientSideType: 3,
           name: '生产端'
         }
-      ]
+      ],
+
+      isShowOpen: false,
+      openData: {}
     }
   },
 
@@ -115,6 +167,9 @@ export default {
   然而，挂载阶段还没开始，el property 目前尚不可用。
   */
   created () {
+  },
+
+  activated () {
     this._getList()
   },
 
@@ -122,6 +177,23 @@ export default {
   },
 
   methods: {
+    // 搜索
+    handleSearch () {
+      this._getList()
+    },
+
+    // 去面料端的品牌管理
+    handelGoBrandByCloth (data) {
+      this.$router.push({
+        path: '/project/cloth/brand',
+        query: {
+          clientMerchantCode: data.clientMerchantCode,
+          name: data.name,
+          id: data.id
+        }
+      })
+    },
+
     // 列表 参数初始化
     _initParams (data) {
       this.params = {
@@ -148,6 +220,17 @@ export default {
         path: '/project/model',
         query: {
           clientMerchantCode: data.clientMerchantCode
+        }
+      })
+    },
+
+    // 面料品牌管理
+    handelGoBrand (data) {
+      this.$router.push({
+        path: '/project/brand/List',
+        query: {
+          clientMerchantCode: data.clientMerchantCode,
+          name: data.name
         }
       })
     },
@@ -216,27 +299,25 @@ export default {
 
     // 开通功能
     handleOpenFunction (data) {
-      this.$confirm(`此操作将开通此用户的${this._openName()}功能, 是否继续?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this._openFunction(data)
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
-      })
+      this.isShowOpen = true
+      this.openData = data
+      this.$set(this.openData, 'password', '')
+    },
+
+    //
+    handleOpen () {
+      this._openFunction(this.openData)
     },
 
     // 开通功能
     _openFunction (data) {
       this.$http.post(this.$apis.api_merchant_save, {
         userId: data.id,
-        clientSideType: this.params.clientSideType
+        clientSideType: this.params.clientSideType,
+        password: this.openData.password
       }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        this.isShowOpen = false
         this.$message.success('开通成功')
         this._getList()
       }).catch(res => {
@@ -254,7 +335,8 @@ export default {
     // 页容量
     handleSizeChange (e) {
       this._initParams({
-        pageSize: e
+        pageSize: e,
+        clientSideType: this.params.clientSideType
       })
       this._getList()
     },
@@ -262,7 +344,8 @@ export default {
     // 页码
     handleCurrentChange (e) {
       this._initParams({
-        currentPage: e
+        currentPage: e,
+        clientSideType: this.params.clientSideType
       })
       this._getList()
     }
@@ -290,5 +373,21 @@ export default {
     cursor: pointer;
     color: white;
   }
+}
+
+.title-box{
+  width: 120px;
+  font-weight: 500;
+  color: #666666;
+  line-height: 48px;
+  text-align-last: justify;
+}
+
+.input-password{
+  width: 210px;
+}
+
+.open-box{
+  font-size: 18px;
 }
 </style>

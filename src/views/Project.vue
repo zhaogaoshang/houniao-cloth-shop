@@ -1,6 +1,8 @@
 <template>
   <div class="public-column container">
-    <router-view></router-view>
+    <keep-alive include="ProjectList">
+      <router-view></router-view>
+    </keep-alive>
   </div>
 </template>
 <script>

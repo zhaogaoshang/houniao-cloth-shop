@@ -6,7 +6,7 @@ import store from '../store'
 
 const axiosWrap = axios.create({
   // baseURL: api.host,
-  baseURL: '/api',
+  // baseURL: '/api',
   timeout: 500000,
   headers: {
     'Content-Type': 'application/json'

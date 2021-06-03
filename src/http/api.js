@@ -28,6 +28,7 @@ const $apis = {
   api_category_list: 'api/category/list', // 列表
   api_category_save: 'api/category/save', // 添加
   api_category_update: 'api/category/update', // 修改
+  api_category_categoryList: 'api/category/categoryList', // 调用3级分类
   api_volumeBodilyConfiguration_save: 'api/volumeBodilyConfiguration/save', // 量体部位配置
   api_volumeBodilyConfiguration_list: 'api/volumeBodilyConfiguration/list', // 量体部位配置 列表
   api_volumeBodilyConfiguration_update: 'api/volumeBodilyConfiguration/update', // 量体部位配置 修改

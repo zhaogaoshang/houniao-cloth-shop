@@ -36,30 +36,30 @@
       <div class="public-heng">
         <!-- <div class="client-title">客户列表</div> -->
         <div>
-          <el-select v-model="params.brandId" placeholder="品牌选择">
+          <el-select v-model="params.brandUuid" placeholder="品牌选择" @change="handleChangBrand">
             <el-option
               v-for="item in brandList.items"
-              :key="item.id"
+              :key="item.uuid"
               :label="item.name"
-              :value="item.id">
+              :value="item.uuid">
             </el-option>
           </el-select>
 
-          <el-select v-model="params.attributeId" placeholder="属性选择">
+          <el-select v-model="params.attributeUuid" placeholder="属性选择" @change="handleChangAttribute">
             <el-option
               v-for="item in attributeList.items"
-              :key="item.id"
+              :key="item.uuid"
               :label="item.name"
-              :value="item.id">
+              :value="item.uuid">
             </el-option>
           </el-select>
 
-          <el-select v-model="params.colourId" placeholder="颜色">
+          <el-select v-model="params.colourUuid" placeholder="颜色" @change="handleChangColor">
             <el-option
               v-for="item in colorList.items"
-              :key="item.id"
+              :key="item.uuid"
               :label="item.name"
-              :value="item.id">
+              :value="item.uuid">
             </el-option>
           </el-select>
         </div>
@@ -68,23 +68,25 @@
       <el-table
         :data="tableData.items">
         <el-table-column
+          width="50"
           type="index"
           label="序号">
         </el-table-column>
         <el-table-column
+          width="100"
           label="面料图">
+          <template slot-scope="scope">
+            <img class="cloth-image" :src="$apis.photoHost + scope.row.photoPath">
+          </template>
         </el-table-column>
-          <!-- <template slot-scope="scope">
-            <img :src="$apis.photoHost + scope.row.photoPath">
-          </template> -->
         <el-table-column
           prop="brandName"
           label="面料品牌">
         </el-table-column>
-        <!-- <el-table-column
-          prop="workPosition"
+        <el-table-column
+          prop="materialNo"
           label="面料编号">
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column
           prop="name"
           label="面料名称">
@@ -101,13 +103,18 @@
           prop="materialComponent"
           label="面料成分">
         </el-table-column>
-        <!-- <el-table-column
-          prop="remark"
+        <el-table-column
           label="适用品类">
-        </el-table-column> -->
-        <!-- <el-table-column
+          <template slot-scope="scope">
+            {{scope.row.categoryJson | handleCategoryToString}}
+          </template>
+        </el-table-column>
+        <el-table-column
           label="是否上传材质球">
-        </el-table-column> -->
+          <template slot-scope="scope">
+            {{scope.row.modelPath ? '已经上传' : '未上传'}}
+          </template>
+        </el-table-column>
         <el-table-column
           prop="address"
           label="操作">
@@ -148,9 +155,10 @@ export default {
         currentPage: 1, // 当前页 默认为1
         pageSize: 10, // 每页条数 默认10
         name: '', // 名字
-        brandId: '', // 品牌
-        attributeId: '', // 属性
-        colourId: '' // 颜色
+        brandUuid: '', // 品牌
+        attributeUuid: '', // 属性
+        colourUuid: '', // 颜色
+        originalMerchantCode: '1233'
       },
 
       tableData: {
@@ -178,37 +186,93 @@ export default {
     this._getList()
   },
   methods: {
+    // 品牌发生变化
+    handleChangBrand () {
+      this._initParams({
+        brandUuid: this.params.brandUuid
+      })
+      this._getList()
+    },
+
+    // 属性筛选
+    handleChangAttribute () {
+      this._initParams({
+        attributeUuid: this.params.attributeUuid
+      })
+      this._getList()
+    },
+
+    // 颜色筛选
+    handleChangColor () {
+      this._initParams({
+        colourUuid: this.params.colourUuid
+      })
+      this._getList()
+    },
+
+    // 初始化参数
+    _initParams (e) {
+      this.params = {
+        currentPage: 1, // 当前页 默认为1
+        pageSize: 10, // 每页条数 默认10
+        name: '', // 名字
+        brandUuid: '', // 品牌
+        attributeUuid: '', // 属性
+        colourUuid: '', // 颜色
+        originalMerchantCode: '1233',
+        ...e
+      }
+    },
+
     // 获取品牌
     _getBrand () {
       this.$http.post(this.$apis.api_materialConfig_list, {
         type: 1 // 1品牌2颜色3属性
       }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        res.result.items.unshift({
+          name: '全部品牌',
+          uuid: null
+        })
         this.brandList = res.result
       })
     },
+
     // 获取颜色
     _getColor () {
       this.$http.post(this.$apis.api_materialConfig_list, {
         type: 2 // 1品牌2颜色3属性
       }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        res.result.items.unshift({
+          name: '全部颜色',
+          uuid: null
+        })
         this.colorList = res.result
       })
     },
+
     // 获取属性
     _getAttribute () {
       this.$http.post(this.$apis.api_materialConfig_list, {
         type: 3 // 1品牌2颜色3属性
       }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        res.result.items.unshift({
+          name: '全部属性',
+          uuid: null
+        })
         this.attributeList = res.result
       })
     },
 
     // 获取列表
     _getList () {
-      this.$http.post(this.$apis.api_material_list, this.params).then(res => {
+      this.$http.post(this.$apis.api_material_list, {
+        ...this.params,
+        merchantCode: '',
+        superMerchantCode: ''
+      }).then(res => {
         if (res.code !== 'SUCCESS') return this.$message(res.msg)
         if (res.result.items.length === 0 && this.params.currentPage > 1) {
           --this.params.currentPage
@@ -219,21 +283,9 @@ export default {
       })
     },
 
-    _initParams (e = {}) {
-      this.params = {
-        currentPage: 1, // 当前页 默认为1
-        pageSize: 10, // 每页条数 默认10
-        name: '', // 名字
-        brandId: '', // 品牌
-        attributeId: '', // 属性
-        colourId: '', // 颜色
-        ...e
-      }
-    },
-
     // 修改
     handleGoAddEdit (data) {
-      this.$store.commit('cloth/setagent', data)
+      this.$store.commit('cloth/setagent', JSON.parse(JSON.stringify(data)))
       this.$router.push({
         path: '/cloth/add/edit'
       })
@@ -273,6 +325,7 @@ export default {
       this._initParams({
         name: this.params.name
       })
+      this._getList()
     },
 
     // 页容量
@@ -306,5 +359,10 @@ export default {
 .client-title{
   font-size: 22px;
   font-weight: 800;
+}
+.cloth-image{
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
 }
 </style>

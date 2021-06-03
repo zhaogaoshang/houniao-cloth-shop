@@ -110,6 +110,38 @@ const route = new Router({
                   }
                 }
               ]
+            },
+            {
+              path: '/project/brand/List',
+              name: 'ProjectBrandList',
+              component: () => import('@/views/ProjectBrandList'),
+              meta: {
+                requiresAuth: true
+              }
+            },
+            {
+              path: '/project/brand/add',
+              name: 'ProjectBrandAdd',
+              component: () => import('@/views/ProjectBrandAdd'),
+              meta: {
+                requiresAuth: true
+              }
+            },
+            {
+              path: '/project/cloth/brand',
+              name: 'ProjectClothBrand',
+              component: () => import('@/views/ProjectClothBrand'),
+              meta: {
+                requiresAuth: true
+              }
+            },
+            {
+              path: '/project/cloth/brand/add',
+              name: 'ProjectClothBrandAdd',
+              component: () => import('@/views/ProjectClothBrandAdd'),
+              meta: {
+                requiresAuth: true
+              }
             }
           ]
         },

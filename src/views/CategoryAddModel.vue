@@ -47,7 +47,7 @@
               </el-tooltip>
               <el-tooltip placement="right" v-if="node.level==3">
                 <div slot="content">
-                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('add', data)">新增子级分类</div>
+                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('add', data, false)">新增子级分类</div>
                   <div class="public-shou handle-categorty" @click="handleGoCategoryModelManage(data)">组件管理</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data)">编辑</div>
                   <div class="public-shou handle-categorty" @click="handleAddDeleteCategory(data)">删除</div>
@@ -58,8 +58,8 @@
               </el-tooltip>
               <el-tooltip placement="right" v-if="node.level==4">
                 <div slot="content">
-                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('add', data)">新增子级分类</div>
-                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data)">编辑</div>
+                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('add', data, false)">新增子级分类</div>
+                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data, false)">编辑</div>
                   <div class="public-shou handle-categorty" @click="handleAddDeleteCategory(data)">删除</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 0">禁用</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 1">启用</div>
@@ -68,7 +68,7 @@
               </el-tooltip>
               <el-tooltip placement="right" v-if="node.level==5">
                 <div slot="content">
-                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data)">编辑</div>
+                  <div class="public-shou handle-categorty" @click="handleAddEditCategory('edit', data, false)">编辑</div>
                   <div class="public-shou handle-categorty" @click="handleAddDeleteCategory(data)">删除</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 0">禁用</div>
                   <div class="public-shou handle-categorty" @click="handleAddEditDisableOrEnable(data)" v-if="data.status == 1">启用</div>
@@ -95,7 +95,7 @@
         <span class="name-text">分类名称：</span>
         <el-input :value="handelCategory.name" v-model="handelCategory.name"></el-input>
       </div>
-      <div class="public-row__align caterogy-name__box" v-if="handelCategory.name">
+      <div class="public-row__align caterogy-name__box" v-if="handelCategory.name && isAddPhoto">
         <span class="name-text">分类图片：</span>
         <!-- <el-upload
           :headers="{
@@ -177,7 +177,9 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'name'
-      }
+      },
+
+      isAddPhoto: true // 是否添加图片
     }
   },
 
@@ -210,13 +212,15 @@ export default {
         }
       })
     },
+
     // 量体部位配置
     handleGoMeasureConfig (e) {
       this.$router.push({
         path: '/category/model/measure/config',
         query: {
           name: e.name,
-          id: e.id
+          id: e.id,
+          uuid: e.uuid
         }
       })
     },
@@ -321,10 +325,10 @@ export default {
 
     // 修改分类
     _editCategory () {
-      if (!this.handelCategory.name || !this.handelCategory.photoPath) {
-        this.$message.error('请填写完整信息')
-        return
-      }
+      // if (!this.handelCategory.name || !this.handelCategory.photoPath) {
+      //   this.$message.error('请填写完整信息')
+      //   return
+      // }
       this.$http.post(this.$apis.api_category_update, {
         id: this.handelCategory.id,
         name: this.handelCategory.name,
@@ -354,10 +358,10 @@ export default {
 
     // 添加分类
     _addCategory () {
-      if (!this.handelCategory.name || !this.handelCategory.photoPath) {
-        this.$message.error('请填写完整信息')
-        return
-      }
+      // if (!this.handelCategory.name || !this.handelCategory.photoPath) {
+      //   this.$message.error('请填写完整信息')
+      //   return
+      // }
       this.$http.post(this.$apis.api_category_save, {
         ...this.handelCategory
       }).then(res => {
@@ -384,7 +388,8 @@ export default {
     },
 
     // 添加 编辑 显示分类
-    handleAddEditCategory (type, data) {
+    handleAddEditCategory (type, data, isAddPhoto = true) {
+      this.isAddPhoto = isAddPhoto
       this.editCategory = type // add edit
 
       if (type === 'add') {

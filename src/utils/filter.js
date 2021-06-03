@@ -7,6 +7,11 @@ Vue.filter('filterSex', function (value) {
   return value === 0 ? '男' : '女'
 })
 
+// 分类的名字以，分离
+Vue.filter('handleCategoryToString', function (value) {
+  return JSON.parse(value).map(item => item.name).join(',')
+})
+
 // [{},{}] 返回指定的value 以 / 分割
 Vue.filter('jsonToString', function (value) {
   let jsonArr = JSON.parse(value)

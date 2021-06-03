@@ -25,7 +25,7 @@ export default {
   name: 'Login',
   data () {
     return {
-      passwordType: 'text',
+      passwordType: 'password',
       form: {
         phone: '',
         password: '',
@@ -48,18 +48,14 @@ export default {
   },
   methods: {
     handleSubmit () {
-      try {
-        this.$http.post(this.$apis.api_login_login, this.form).then(res => {
-          if (res.code !== 'SUCCESS') return this.$message(res.msg)
-          this.$store.commit('user/setUserInfo', res.result)
-          this.$store.commit('user/setToken', res.sign)
-          this.$router.replace('/')
-        }).catch(res => {
-          // alert('post')
-        })
-      } catch (error) {
-        alert(error)
-      }
+      this.$http.post(this.$apis.api_login_login, this.form).then(res => {
+        if (res.code !== 'SUCCESS') return this.$message(res.msg)
+        this.$store.commit('user/setUserInfo', res.result)
+        this.$store.commit('user/setToken', res.sign)
+        this.$router.replace('/')
+      }).catch(res => {
+        // alert('post')
+      })
     }
   }
 }
@@ -71,9 +67,6 @@ export default {
     height: 500px;
   }
   .write-box{
-    // position: absolute;
-    // top: 30%;
-    // right: 25%;
     width: 360px;
     margin: 0 auto;
     margin-top: 127px;

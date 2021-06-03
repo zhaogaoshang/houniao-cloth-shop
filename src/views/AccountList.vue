@@ -2,7 +2,7 @@
   <div class="public-column category">
     <user>
       <search @search="handleSearch" v-model="params.userInfo"></search>
-      <discolor-btn typeStyle="middle" @click.native="handleGoAddEdit('add')">添加账号</discolor-btn>
+      <discolor-btn typeStyle="middle" @click.native="handleGoAddEdit('add')">添加企业</discolor-btn>
     </user>
     <div class="public-row bottom-info">
       <shadow-box>
@@ -31,7 +31,7 @@
             <el-table-column
               prop="name"
               width="200"
-              label="账号名称">
+              label="企业名称">
             </el-table-column>
             <el-table-column
               width="500"
